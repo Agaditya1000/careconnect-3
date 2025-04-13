@@ -19,7 +19,7 @@ connectCloudinary();
 
 // CORS Configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || '*', // Replace with your frontend URL
+  origin: process.env.FRONTEND_URL || 'https://careconnect-3-e14m.vercel.app/', // Replace with your frontend URL
   credentials: true,
   allowedHeaders: [
     'X-CSRF-Token', 
