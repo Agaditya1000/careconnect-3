@@ -17,57 +17,45 @@ const port = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
-// Body parsers
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Middlewares
+app.use(cors());
+app.use(express.json());
 
-// API endpoints (ensure no trailing slashes in route definitions)
+// API endpoints
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/chat", chatbotRoutes);
 app.use("/api/ambulance", ambulanceRoutes);
-app.use("/api/lab-bookings", labBookingRouter);
+app.use("/api/lab-bookings", labBookingRouter); // Updated endpoint
 
-// Health check endpoint
 app.get("/", (req, res) => {
-  res.status(200).json({ 
-    status: 'healthy',
-    message: 'API is working',
-    timestamp: new Date().toISOString(),
-    allowedOrigins
-  });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Endpoint not found',
-    path: req.url
-  });
+  res.send("API Working");
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
-  
-  if (err.message === 'Not allowed by CORS') {
-    return res.status(403).json({ 
-      success: false,
-      message: 'CORS policy: Origin not allowed',
-      allowedOrigins
-    });
-  }
-
+  console.error(err.stack);
   res.status(500).json({ 
     success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: 'Something went wrong!' 
   });
 });
 
-app.listen(port, () => {
-  console.log(`Server started on PORT:${port}`);
- 
+
+app.use(cors());
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+    );
+    next();
 });
+
+app.listen(port, () => console.log(`Server started on PORT:${port}`));
