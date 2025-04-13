@@ -17,58 +17,6 @@ const port = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
-// Configure allowed origins
-const allowedOrigins = [
-  'https://careconnect-3-xaej.vercel.app',
-  'https://careconnect-3-e14m.vercel.app',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
-// Enhanced CORS configuration
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.some(allowedOrigin => 
-      origin === allowedOrigin || 
-      origin.startsWith(allowedOrigin.replace(/\/$/, ''))
-    )) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked for origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-    'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Special handler for preflight requests
-app.options('*', cors(corsOptions));
-
-// Middleware to prevent double slashes
-app.use((req, res, next) => {
-  if (req.url.includes('//')) {
-    return res.redirect(301, req.url.replace(/\/+/g, '/'));
-  }
-  next();
-});
-
 // Body parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -121,5 +69,5 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
   console.log(`Server started on PORT:${port}`);
-  console.log('Allowed origins:', allowedOrigins);
+ 
 });

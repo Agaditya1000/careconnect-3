@@ -31,7 +31,7 @@ const Login = () => {
 
     } else {
 
-      const { data } = await axios.post('https://careconnect-3-e14m.vercel.app/api/user/login', { email, password })
+      const { data } = await axios.post(backendUrl + '/api/user/login', { email, password })
 
       if (data.success) {
         localStorage.setItem('token', data.token)
