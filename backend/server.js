@@ -17,9 +17,24 @@ const port = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
-// CORS Configuration
+// Enhanced CORS Configuration
+const allowedOrigins = [
+  'https://careconnect-3-xaej.vercel.app',
+  'https://careconnect-3-e14m.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean); // Remove any falsy values
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'https://careconnect-3-xaej.vercel.app/', // Replace with your frontend URL
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin) || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   allowedHeaders: [
     'X-CSRF-Token', 
@@ -30,16 +45,23 @@ const corsOptions = {
     'Content-MD5', 
     'Content-Type', 
     'Date', 
-    'X-Api-Version'
+    'X-Api-Version',
+    'Authorization'
   ],
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE', 'HEAD'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
-// Middlewares - CORS should be before route definitions
+// Middlewares
 app.use(cors(corsOptions));
 
-// Body parser
-app.use(express.json());
+// Handle preflight requests for all routes
+app.options('*', cors(corsOptions));
+
+// Body parser with increased limit
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // API endpoints
 app.use("/api/user", userRouter);
@@ -49,17 +71,43 @@ app.use("/api/chat", chatbotRoutes);
 app.use("/api/ambulance", ambulanceRoutes);
 app.use("/api/lab-bookings", labBookingRouter);
 
+// Health check endpoint
 app.get("/", (req, res) => {
-  res.send("API Working");
+  res.status(200).json({ 
+    status: 'healthy',
+    message: 'API is working',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Endpoint not found'
+  });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  
+  // Handle CORS errors specifically
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ 
+      success: false,
+      message: 'CORS policy: Origin not allowed' 
+    });
+  }
+
   res.status(500).json({ 
     success: false,
-    message: 'Something went wrong!' 
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
 
-app.listen(port, () => console.log(`Server started on PORT:${port}`));
+app.listen(port, () => {
+  console.log(`Server started on PORT:${port}`);
+  console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
+});
