@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+    restart: always
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_BACKEND_URL=http://backend:4000
+    depends_on:
+      - backend
+    restart: always
+
+  admin:
+    build: ./admin
+    ports:
+      - "5174:80"
+    environment:
+      - VITE_BACKEND_URL=http://backend:4000
+    depends_on:
+      - backend
+    restart: always

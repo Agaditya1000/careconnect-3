@@ -18,6 +18,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
 import LabBooking from './pages/LabBooking'
 import BuyMedicalEssentials from './pages/BuyMedicalEssential'
+import MedicineReminder from './pages/MedicineReminder'
+import MedicalRecords from './pages/MedicalRecord'
 
 const App = () => {
   return (
@@ -39,6 +41,8 @@ const App = () => {
         <Route path='/book-ambulance' element={<BookAnAmbulance />} />
         <Route path='/lab-tests' element={<LabBooking />} />
         <Route path='/medical-supplies' element={<BuyMedicalEssentials />} />
+        <Route path='/medicine-reminder' element={<MedicineReminder />} />
+        <Route path='/medical-records' element={<MedicalRecords />} />
       </Routes>
       <Chatbot /> {/* ✅ Add Chatbot component here */}
       <Footer />

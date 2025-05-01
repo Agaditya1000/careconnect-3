@@ -63,7 +63,7 @@ const PatientDashboard = () => {
         </Link>
         <div className="sm:col-span-2 lg:col-span-1">
           <Link 
-            to="/medicine-reminders" 
+            to="/medicine-reminder" 
             className="bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-lg text-center transition-colors block w-full h-full"
           >
             Medicine Reminders
