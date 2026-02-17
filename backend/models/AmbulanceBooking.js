@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 const ambulanceBookingSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true
+  },
   patientName: {
     type: String,
     required: [true, 'Patient name is required']

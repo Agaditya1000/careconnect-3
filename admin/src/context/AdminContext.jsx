@@ -7,7 +7,7 @@ export const AdminContext = createContext()
 
 const AdminContextProvider = (props) => {
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
+    const backendUrl = 'http://localhost:4000' // import.meta.env.VITE_BACKEND_URL
 
     const [aToken, setAToken] = useState(localStorage.getItem('aToken') ? localStorage.getItem('aToken') : '')
 
@@ -111,6 +111,128 @@ const AdminContextProvider = (props) => {
 
     }
 
+    const [ambulanceBookings, setAmbulanceBookings] = useState([])
+    const [labBookings, setLabBookings] = useState([])
+
+    // Getting all ambulance bookings from Database using API
+    const getAllAmbulanceBookings = async () => {
+        try {
+            const { data } = await axios.get(backendUrl + '/api/admin/ambulance', { headers: { aToken } })
+            if (data.success) {
+                setAmbulanceBookings(data.bookings)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    // Getting all lab bookings from Database using API
+    const getAllLabBookings = async () => {
+        try {
+            const { data } = await axios.get(backendUrl + '/api/admin/lab-bookings', { headers: { aToken } })
+            if (data.success) {
+                setLabBookings(data.bookings)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    // Function to cancel ambulance booking
+    const cancelAmbulanceBooking = async (bookingId) => {
+        try {
+            const { data } = await axios.post(backendUrl + '/api/admin/cancel-ambulance', { bookingId }, { headers: { aToken } })
+            if (data.success) {
+                toast.success(data.message)
+                getAllAmbulanceBookings()
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    // Function to approve ambulance booking
+    const approveAmbulanceBooking = async (bookingId) => {
+        try {
+            const { data } = await axios.post(backendUrl + '/api/admin/approve-ambulance', { bookingId }, { headers: { aToken } })
+            if (data.success) {
+                toast.success(data.message)
+                getAllAmbulanceBookings()
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    // Function to cancel lab booking
+    const cancelLabBooking = async (bookingId) => {
+        try {
+            const { data } = await axios.post(backendUrl + '/api/admin/cancel-lab', { bookingId }, { headers: { aToken } })
+            if (data.success) {
+                toast.success(data.message)
+                getAllLabBookings()
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    // Function to confirm lab booking
+    const confirmLabBooking = async (bookingId) => {
+        try {
+            const { data } = await axios.post(backendUrl + '/api/admin/confirm-lab', { bookingId }, { headers: { aToken } })
+            if (data.success) {
+                toast.success(data.message)
+                getAllLabBookings()
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const [products, setProducts] = useState([])
+
+    // Function to list all products
+    const getAllProducts = async () => {
+        try {
+            const { data } = await axios.get(backendUrl + '/api/product/list')
+            if (data.success) {
+                setProducts(data.products)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    // Function to remove product
+    const removeProduct = async (id) => {
+        try {
+            const { data } = await axios.post(backendUrl + '/api/product/remove', { id }, { headers: { aToken } })
+            if (data.success) {
+                toast.success(data.message)
+                getAllProducts()
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
     const value = {
         aToken, setAToken,
         doctors,
@@ -120,7 +242,19 @@ const AdminContextProvider = (props) => {
         getAllAppointments,
         getDashData,
         cancelAppointment,
-        dashData
+        dashData,
+        ambulanceBookings,
+        getAllAmbulanceBookings,
+        cancelAmbulanceBooking,
+        approveAmbulanceBooking,
+        labBookings,
+        getAllLabBookings,
+        cancelLabBooking,
+        confirmLabBooking,
+        products,
+        getAllProducts,
+        removeProduct,
+        backendUrl
     }
 
     return (

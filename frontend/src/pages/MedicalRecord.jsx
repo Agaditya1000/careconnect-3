@@ -1,333 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AppContext } from '../context/AppContext';
+import { assets } from '../assets/assets';
 
 const MedicalRecords = () => {
-  const [activeTab, setActiveTab] = useState('blood');
-  const [expandedReport, setExpandedReport] = useState(null);
+  const { userMedicalRecords, addMedicalRecord } = useContext(AppContext);
+  const [showForm, setShowForm] = useState(false);
 
-  const toggleReport = (id) => {
-    setExpandedReport(expandedReport === id ? null : id);
-  };
+  // Form State
+  const [title, setTitle] = useState('');
+  const [type, setType] = useState('Lab Report');
+  const [doctor, setDoctor] = useState('');
+  const [date, setDate] = useState('');
+  const [summary, setSummary] = useState('');
+  const [file, setFile] = useState(null);
 
-  // Sample medical reports data
-  const bloodReports = [
-    {
-      id: 1,
-      date: '2023-05-15',
-      type: 'Complete Blood Count (CBC)',
-      doctor: 'Dr. Sarah Johnson',
-      summary: 'Routine checkup',
-      details: {
-        hemoglobin: '14.2 g/dL (Normal: 13.5-17.5)',
-        hematocrit: '42.5% (Normal: 38.8-50.0)',
-        wbc: '6.8 × 10³/μL (Normal: 4.5-11.0)',
-        rbc: '4.7 × 10⁶/μL (Normal: 4.3-5.9)',
-        platelets: '250 × 10³/μL (Normal: 150-450)',
-        glucose: '98 mg/dL (Normal: 70-99)'
-      },
-      status: 'Normal'
-    },
-    {
-      id: 2,
-      date: '2023-03-10',
-      type: 'Lipid Panel',
-      doctor: 'Dr. Michael Chen',
-      summary: 'Cholesterol screening',
-      details: {
-        totalCholesterol: '210 mg/dL (<200 desirable)',
-        hdl: '45 mg/dL (>40 desirable)',
-        ldl: '140 mg/dL (<100 optimal)',
-        triglycerides: '125 mg/dL (<150 normal)'
-      },
-      status: 'Borderline High'
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('type', type);
+    formData.append('doctor', doctor);
+    formData.append('date', date);
+    formData.append('summary', summary);
+    if (file) formData.append('file', file);
+
+    const success = await addMedicalRecord(formData);
+    if (success) {
+      setShowForm(false);
+      setTitle('');
+      setDoctor('');
+      setDate('');
+      setSummary('');
+      setFile(null);
     }
-  ];
+  }
 
-  const imagingReports = [
-    {
-      id: 3,
-      date: '2023-04-22',
-      type: 'X-Ray',
-      area: 'Chest',
-      doctor: 'Dr. Emily Rodriguez',
-      summary: 'Persistent cough evaluation',
-      findings: 'No active pulmonary disease. Heart size normal. No pleural effusion or pneumothorax.',
-      impression: 'No acute cardiopulmonary abnormality',
-      status: 'Normal'
-    },
-    {
-      id: 4,
-      date: '2023-01-05',
-      type: 'MRI',
-      area: 'Brain',
-      doctor: 'Dr. James Wilson',
-      summary: 'Headache assessment',
-      findings: 'No evidence of mass lesions or hemorrhage. Normal ventricular size. No restricted diffusion.',
-      impression: 'Unremarkable brain MRI',
-      status: 'Normal'
-    }
-  ];
-
-  const otherReports = [
-    {
-      id: 5,
-      date: '2023-06-18',
-      type: 'Urinalysis',
-      doctor: 'Dr. Lisa Park',
-      summary: 'Annual physical exam',
-      details: {
-        color: 'Yellow (Normal)',
-        appearance: 'Clear (Normal)',
-        protein: 'Negative (Normal)',
-        glucose: 'Negative (Normal)',
-        ketones: 'Negative (Normal)',
-        bilirubin: 'Negative (Normal)'
-      },
-      status: 'Normal'
-    },
-    {
-      id: 6,
-      date: '2023-02-28',
-      type: 'ECG',
-      doctor: 'Dr. Robert Kim',
-      summary: 'Heart palpitations',
-      findings: 'Normal sinus rhythm. Rate 72 bpm. PR interval 160 ms. QRS duration 88 ms. QT interval 380 ms. No ST-T changes.',
-      impression: 'Normal ECG',
-      status: 'Normal'
-    }
-  ];
-
-  // Styles
-  const styles = {
-    container: {
-      maxWidth: '1200px',
-      margin: '0 auto',
-      padding: '20px',
-      fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-      backgroundColor: '#f5f7fa',
-      minHeight: '100vh'
-    },
-    header: {
-      textAlign: 'center',
-      marginBottom: '30px',
-      color: '#2c3e50'
-    },
-    tabs: {
-      display: 'flex',
-      justifyContent: 'center',
-      marginBottom: '30px',
-      borderBottom: '1px solid #ddd'
-    },
-    tab: {
-      padding: '12px 24px',
-      margin: '0 10px',
-      cursor: 'pointer',
-      border: 'none',
-      backgroundColor: 'transparent',
-      fontSize: '16px',
-      fontWeight: '600',
-      color: '#7f8c8d',
-      borderBottom: '3px solid transparent',
-      transition: 'all 0.3s ease'
-    },
-    activeTab: {
-      color: '#3498db',
-      borderBottom: '3px solid #3498db'
-    },
-    reportsContainer: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(500px, 1fr))',
-      gap: '20px'
-    },
-    reportCard: {
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-      padding: '20px',
-      transition: 'all 0.3s ease'
-    },
-    reportHeader: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '15px',
-      cursor: 'pointer'
-    },
-    reportTitle: {
-      fontSize: '18px',
-      fontWeight: '600',
-      color: '#2c3e50',
-      margin: '0'
-    },
-    reportDate: {
-      color: '#7f8c8d',
-      fontSize: '14px'
-    },
-    reportMeta: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      marginBottom: '15px',
-      fontSize: '14px',
-      color: '#7f8c8d'
-    },
-    status: (status) => ({
-      padding: '4px 10px',
-      borderRadius: '20px',
-      fontSize: '12px',
-      fontWeight: '600',
-      backgroundColor: status === 'Normal' ? '#e3fcef' : '#ffebee',
-      color: status === 'Normal' ? '#00a76f' : '#ff5630'
-    }),
-    reportSummary: {
-      color: '#34495e',
-      marginBottom: '15px',
-      lineHeight: '1.5'
-    },
-    reportDetails: {
-      marginTop: '15px',
-      borderTop: '1px solid #eee',
-      paddingTop: '15px'
-    },
-    detailRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      marginBottom: '8px',
-      padding: '8px 0',
-      borderBottom: '1px solid #f5f5f5'
-    },
-    detailLabel: {
-      fontWeight: '600',
-      color: '#2c3e50'
-    },
-    detailValue: {
-      color: '#34495e'
-    },
-    findings: {
-      marginBottom: '10px',
-      lineHeight: '1.5'
-    },
-    impression: {
-      fontStyle: 'italic',
-      fontWeight: '600',
-      color: '#2c3e50'
-    },
-    expandButton: {
-      backgroundColor: '#3498db',
-      color: 'white',
-      border: 'none',
-      padding: '8px 16px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      fontSize: '14px',
-      marginTop: '10px'
-    },
-    noReports: {
-      textAlign: 'center',
-      color: '#7f8c8d',
-      gridColumn: '1 / -1'
-    }
-  };
-
-  const renderReportDetails = (report) => {
-    if (report.details) {
-      return (
-        <div style={styles.reportDetails}>
-          {Object.entries(report.details).map(([key, value]) => (
-            <div key={key} style={styles.detailRow}>
-              <span style={styles.detailLabel}>{key.charAt(0).toUpperCase() + key.slice(1)}:</span>
-              <span style={styles.detailValue}>{value}</span>
-            </div>
-          ))}
-        </div>
-      );
-    } else {
-      return (
-        <div style={styles.reportDetails}>
-          <div style={styles.findings}>
-            <strong>Findings:</strong> {report.findings}
-          </div>
-          <div style={styles.impression}>
-            <strong>Impression:</strong> {report.impression}
-          </div>
-        </div>
-      );
-    }
-  };
-
-  const renderReports = () => {
-    let reports = [];
-    switch (activeTab) {
-      case 'blood':
-        reports = bloodReports;
-        break;
-      case 'imaging':
-        reports = imagingReports;
-        break;
-      case 'other':
-        reports = otherReports;
-        break;
-      default:
-        reports = [];
-    }
-
-    if (reports.length === 0) {
-      return <div style={styles.noReports}>No reports found for this category</div>;
-    }
-
-    return reports.map((report) => (
-      <div key={report.id} style={styles.reportCard}>
-        <div 
-          style={styles.reportHeader} 
-          onClick={() => toggleReport(report.id)}
-        >
-          <h3 style={styles.reportTitle}>{report.type} {report.area ? `- ${report.area}` : ''}</h3>
-          <span style={styles.reportDate}>{report.date}</span>
-        </div>
-        <div style={styles.reportMeta}>
-          <span>Ordered by: {report.doctor}</span>
-          <span style={styles.status(report.status)}>{report.status}</span>
-        </div>
-        <p style={styles.reportSummary}>{report.summary}</p>
-        {expandedReport === report.id && renderReportDetails(report)}
-        <button 
-          style={styles.expandButton}
-          onClick={() => toggleReport(report.id)}
-        >
-          {expandedReport === report.id ? 'Collapse Report' : 'View Full Report'}
-        </button>
-      </div>
-    ));
-  };
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Medical Records</h1>
-        <p>View and manage your medical test results and reports</p>
-      </header>
-
-      <div style={styles.tabs}>
+    <div className='p-6 max-w-6xl mx-auto'>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-3xl font-bold text-gray-800'>Medical Records</h1>
         <button
-          style={activeTab === 'blood' ? { ...styles.tab, ...styles.activeTab } : styles.tab}
-          onClick={() => setActiveTab('blood')}
+          onClick={() => setShowForm(!showForm)}
+          className='bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-opacity-90 transition'
         >
-          Blood Tests
-        </button>
-        <button
-          style={activeTab === 'imaging' ? { ...styles.tab, ...styles.activeTab } : styles.tab}
-          onClick={() => setActiveTab('imaging')}
-        >
-          Imaging Reports
-        </button>
-        <button
-          style={activeTab === 'other' ? { ...styles.tab, ...styles.activeTab } : styles.tab}
-          onClick={() => setActiveTab('other')}
-        >
-          Other Reports
+          {showForm ? 'Close Form' : 'Add New Record'}
         </button>
       </div>
 
-      <div style={styles.reportsContainer}>
-        {renderReports()}
+      {showForm && (
+        <form onSubmit={handleSubmit} className='bg-white p-6 rounded-xl shadow-md mb-8 border border-gray-100'>
+          <h2 className='text-xl font-semibold mb-4'>Upload New Record</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>Title</label>
+              <input type="text" value={title} onChange={e => setTitle(e.target.value)} className='w-full border rounded-md p-2' required placeholder="e.g. Blood Test Result" />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>Type</label>
+              <select value={type} onChange={e => setType(e.target.value)} className='w-full border rounded-md p-2'>
+                <option>Lab Report</option>
+                <option>Prescription</option>
+                <option>Imaging (X-Ray/MRI)</option>
+                <option>Others</option>
+              </select>
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>Doctor</label>
+              <input type="text" value={doctor} onChange={e => setDoctor(e.target.value)} className='w-full border rounded-md p-2' placeholder="Dr. Name" />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>Date</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} className='w-full border rounded-md p-2' required />
+            </div>
+            <div className='md:col-span-2'>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>Summary</label>
+              <textarea value={summary} onChange={e => setSummary(e.target.value)} className='w-full border rounded-md p-2' rows="3" placeholder="Brief summary of the report..."></textarea>
+            </div>
+            <div className='md:col-span-2'>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>Attachment (Image/PDF)</label>
+              <input type="file" onChange={e => setFile(e.target.files[0])} className='w-full border rounded-md p-2' />
+            </div>
+          </div>
+          <button type='submit' className='mt-4 bg-green-600 text-white px-8 py-2 rounded-md hover:bg-green-700'>Save Record</button>
+        </form>
+      )}
+
+      {/* Records List */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        {userMedicalRecords.length === 0 ? (
+          <p className='text-gray-500 col-span-full text-center py-10'>No medical records found. Add one to get started.</p>
+        ) : (
+          userMedicalRecords.map((record, index) => (
+            <div key={index} className='bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition'>
+              <div className='flex justify-between items-start mb-2'>
+                <span className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium'>{record.type}</span>
+                <span className='text-gray-400 text-xs'>{formatDate(record.date)}</span>
+              </div>
+              <h3 className='text-lg font-bold text-gray-800 mb-1'>{record.title}</h3>
+              <p className='text-sm text-gray-600 mb-3'>By: {record.doctor || 'Unknown'}</p>
+              <p className='text-gray-700 text-sm mb-4 line-clamp-3'>{record.summary}</p>
+              {record.fileUrl && (
+                <a href={record.fileUrl} target='_blank' rel="noreferrer" className='block text-center w-full border border-primary text-primary py-2 rounded-md hover:bg-primary hover:text-white transition'>
+                  View Document
+                </a>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

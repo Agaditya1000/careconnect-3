@@ -20,6 +20,7 @@ import LabBooking from './pages/LabBooking'
 import BuyMedicalEssentials from './pages/BuyMedicalEssential'
 import MedicineReminder from './pages/MedicineReminder'
 import MedicalRecords from './pages/MedicalRecord'
+import MyBookings from './pages/MyBookings'
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
         <Route path='/contact' element={<Contact />} />
         <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/my-appointments' element={<MyAppointments />} />
+        <Route path='/my-bookings' element={<MyBookings />} />
         <Route path='/my-profile' element={<MyProfile />} />
         <Route path='/verify' element={<Verify />} />
         <Route path='/my-dashboard' element={<MyDashboard />} />

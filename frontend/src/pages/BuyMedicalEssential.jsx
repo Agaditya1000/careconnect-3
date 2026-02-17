@@ -1,262 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { ShoppingCart, CreditCard, Truck, Check, Clock, Shield, Zap } from 'lucide-react';
-import facemask from '../images/face-mask.jpg.jpeg.jpg';
-import handsanitizer from '../images/hand-sanitizer.jpg.jpeg.jpg';
-import thermometer from '../images/thermometer.jpg.jpeg.jpg';
-import vitaminc from '../images/vitamin-c.jpg.jpeg.jpg';  
-import firstaidkit from '../images/first-aid-kit.jpg.jpeg.jpg';
-import bloodpressuremonitor from '../images/blood-pressure-monitor.jpg.jpeg.jpg';
-import gloves from '../images/gloves.jpg.jpeg.jpg';
-import disinfectantwipes from '../images/disinfectant-wipes.jpg.jpeg.jpg';
-import multivitamin from '../images/multivitamin.jpg.jpeg.jpg';
-import pulseoximeter from '../images/pulse-oximeter.jpg.jpeg.jpg';
-import n95masks from '../images/n95-masks.jpg.jpeg.jpg';
-import antibacterialsoap from '../images/antibacterial-soap.jpg.jpeg.jpg';
-import zinc from '../images/zinc-tablets.jpg.jpeg.jpg';
-import digitalscale from '../images/digital-scale.jpg.jpeg.jpg';
-import faceshield from '../images/face-shield.jpg.jpeg.jpg';
-import handcream from '../images/hand-cream.jpg.jpeg.jpg';
-import omega3 from '../images/omega-3.jpg.jpeg.jpg';
-import glucometer from '../images/glucometer.jpg.jpeg.jpg';
-import surgicalmasks from '../images/surgical-masks.jpg.jpeg.jpg';
-import mouthwash from '../images/mouthwash.jpg.jpeg.jpg';
-import irontablets from '../images/iron-tablets.jpg.jpeg.jpg';
-import pedometer from '../images/pedometer.jpg.jpeg.jpg';
-import disposablegloves from '../images/disposable-gloves.jpg.jpeg.jpg';
-import antisepticspray from '../images/antiseptic-spray.jpg.jpeg.jpg';
-import calciumtablets from '../images/calcium-tablets.jpg.jpeg.jpg';
-import bodyfatmonitor from '../images/body-fat-monitor.jpg.jpeg.jpg';
-import protectivegoggles from '../images/protective-goggles.jpg.jpeg.jpg';
-import handlotion from '../images/hand-lotion.jpg.jpeg.jpg';
-import vitamind from '../images/vitamin-d.jpg.jpeg.jpg';
-import bloodglucose from '../images/blood-glucose-strips.jpg.jpeg.jpg';
-
-const products = [
-  {
-    id: 1,
-    name: 'Face Mask (Pack of 50)',
-    price: 499,
-    category: 'Protection',
-    image: facemask,
-  },
-  {
-    id: 2,
-    name: 'Hand Sanitizer (500ml)',
-    price: 299,
-    category: 'Hygiene',
-    image: handsanitizer,
-  },
-  {
-    id: 3,
-    name: 'Thermometer',
-    price: 799,
-    category: 'Health Monitoring',
-    image: thermometer,
-  },
-  {
-    id: 4,
-    name: 'Vitamin C Tablets (60 Count)',
-    price: 199,
-    category: 'Supplements',
-    image: vitaminc,
-  },
-  {
-    id: 5,
-    name: 'First Aid Kit',
-    price: 1299,
-    category: 'Emergency',
-    image: firstaidkit,
-  },
-  {
-    id: 6,
-    name: 'Blood Pressure Monitor',
-    price: 2499,
-    category: 'Health Monitoring',
-    image: bloodpressuremonitor,
-  },
-  {
-    id: 7,
-    name: 'Gloves (Pack of 100)',
-    price: 399,
-    category: 'Protection',
-    image: gloves,
-  },
-  {
-    id: 8,
-    name: 'Disinfectant Wipes (Pack of 75)',
-    price: 349,
-    category: 'Hygiene',
-    image: disinfectantwipes,
-  },
-  {
-    id: 9,
-    name: 'Multivitamin Tablets (90 Count)',
-    price: 899,
-    category: 'Supplements',
-    image: multivitamin,
-  },
-  {
-    id: 10,
-    name: 'Pulse Oximeter',
-    price: 1499,
-    category: 'Health Monitoring',
-    image: pulseoximeter,
-  },
-  {
-    id: 11,
-    name: 'N95 Masks (Pack of 20)',
-    price: 999,
-    category: 'Protection',
-    image: n95masks,
-  },
-  {
-    id: 12,
-    name: 'Antibacterial Soap (500ml)',
-    price: 199,
-    category: 'Hygiene',
-    image: antibacterialsoap,
-  },
-  {
-    id: 13,
-    name: 'Zinc Tablets (60 Count)',
-    price: 499,
-    category: 'Supplements',
-    image: zinc,
-  },
-  {
-    id: 14,
-    name: 'Digital Scale',
-    price: 999,
-    category: 'Health Monitoring',
-    image: digitalscale,
-  },
-  {
-    id: 15,
-    name: 'Face Shield (Pack of 10)',
-    price: 799,
-    category: 'Protection',
-    image: faceshield,
-  },
-  {
-    id: 16,
-    name: 'Hand Cream (200ml)',
-    price: 249,
-    category: 'Hygiene',
-    image: handcream,
-  },
-  {
-    id: 17,
-    name: 'Omega-3 Capsules (120 Count)',
-    price: 999,
-    category: 'Supplements',
-    image: omega3,
-  },
-  {
-    id: 18,
-    name: 'Glucometer',
-    price: 1799,
-    category: 'Health Monitoring',
-    image: glucometer,
-  },
-  {
-    id: 19,
-    name: 'Surgical Masks (Pack of 50)',
-    price: 499,
-    category: 'Protection',
-    image: surgicalmasks,
-  },
-  {
-    id: 20,
-    name: 'Mouthwash (500ml)',
-    price: 199,
-    category: 'Hygiene',
-    image: mouthwash,
-  },
-  {
-    id: 21,
-    name: 'Iron Tablets (60 Count)',
-    price: 299,
-    category: 'Supplements',
-    image: irontablets,
-  },
-  {
-    id: 22,
-    name: 'Pedometer',
-    price: 899,
-    category: 'Health Monitoring',
-    image: pedometer,
-  },
-  {
-    id: 23,
-    name: 'Disposable Gloves (Pack of 200)',
-    price: 699,
-    category: 'Protection',
-    image: disposablegloves,
-  },
-  {
-    id: 24,
-    name: 'Antiseptic Spray (100ml)',
-    price: 149,
-    category: 'Hygiene',
-    image: antisepticspray,
-  },
-  {
-    id: 25,
-    name: 'Calcium Tablets (90 Count)',
-    price: 599,
-    category: 'Supplements',
-    image: calciumtablets,
-  },
-  {
-    id: 26,
-    name: 'Body Fat Monitor',
-    price: 1999,
-    category: 'Health Monitoring',
-    image: bodyfatmonitor,
-  },
-  {
-    id: 27,
-    name: 'Protective Goggles (Pack of 5)',
-    price: 499,
-    category: 'Protection',
-    image: protectivegoggles,
-  },
-  {
-    id: 28,
-    name: 'Hand Lotion (300ml)',
-    price: 299,
-    category: 'Hygiene',
-    image: handlotion,
-  },
-  {
-    id: 29,
-    name: 'Vitamin D Tablets (60 Count)',
-    price: 399,
-    category: 'Supplements',
-    image: vitamind,
-  },
-  {
-    id: 30,
-    name: 'Blood Glucose Test Strips (50 Count)',
-    price: 999,
-    category: 'Health Monitoring',
-    image: bloodglucose,
-  },
-];
+import { AppContext } from '../context/AppContext';
 
 export default function BuyMedicalEssentials() {
+  const { products, currencySymbol, placeOrder } = useContext(AppContext);
   const [cart, setCart] = useState([]);
   const [isCheckout, setIsCheckout] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const addToCart = (product) => {
-    const existingItem = cart.find((item) => item.product.id === product.id);
+    const existingItem = cart.find((item) => item.product._id === product._id);
     if (existingItem) {
       setCart(
         cart.map((item) =>
-          item.product.id === product.id
+          item.product._id === product._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
@@ -268,7 +27,7 @@ export default function BuyMedicalEssentials() {
   };
 
   const removeFromCart = (productId) => {
-    setCart(cart.filter((item) => item.product.id !== productId));
+    setCart(cart.filter((item) => item.product._id !== productId));
     toast.success('Item removed from cart!');
   };
 
@@ -319,7 +78,7 @@ export default function BuyMedicalEssentials() {
               <span className="block mt-2 font-medium">- Priya K., Mumbai</span>
             </p>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <div className="flex items-center mb-3">
               <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full mr-3">
@@ -332,7 +91,7 @@ export default function BuyMedicalEssentials() {
               <span className="block mt-2 font-medium">- Rajesh T., Delhi</span>
             </p>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <div className="flex items-center mb-3">
               <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-full mr-3">
@@ -396,8 +155,8 @@ export default function BuyMedicalEssentials() {
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          {products.map((product, index) => (
+            <div key={index} className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
               <img
                 src={product.image}
                 alt={product.name}
@@ -408,7 +167,7 @@ export default function BuyMedicalEssentials() {
               />
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{product.name}</h2>
-                <p className="text-gray-600 dark:text-gray-300 mt-2">₹{product.price.toFixed(2)}</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-2">{currencySymbol}{product.price.toFixed(2)}</p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">{product.category}</p>
                 <button
                   onClick={() => addToCart(product)}
@@ -433,7 +192,7 @@ export default function BuyMedicalEssentials() {
             <>
               <div className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item.product.id} className="flex justify-between items-center">
+                  <div key={item.product._id} className="flex justify-between items-center">
                     <div className="flex items-center">
                       <img
                         src={item.product.image}
@@ -445,11 +204,11 @@ export default function BuyMedicalEssentials() {
                       />
                       <div className="ml-4">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.product.name}</h3>
-                        <p className="text-gray-600 dark:text-gray-300">₹{item.product.price.toFixed(2)} x {item.quantity}</p>
+                        <p className="text-gray-600 dark:text-gray-300">{currencySymbol}{item.product.price.toFixed(2)} x {item.quantity}</p>
                       </div>
                     </div>
                     <button
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => removeFromCart(item.product._id)}
                       className="text-red-600 hover:text-red-700"
                     >
                       Remove

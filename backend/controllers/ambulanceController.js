@@ -4,6 +4,7 @@ import AmbulanceBooking from '../models/AmbulanceBooking.js';
 export const createBooking = async (req, res) => {
   try {
     const booking = new AmbulanceBooking({
+      userId: req.body.userId,
       patientName: req.body.patientName,
       contactNumber: req.body.contactNumber,
       location: req.body.location,
@@ -15,7 +16,7 @@ export const createBooking = async (req, res) => {
     });
 
     const savedBooking = await booking.save();
-    
+
     res.status(201).json({
       success: true,
       booking: savedBooking
@@ -27,6 +28,18 @@ export const createBooking = async (req, res) => {
     });
   }
 };
+
+// Get user specific ambulance bookings
+export const getUserAmbulanceBookings = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const bookings = await AmbulanceBooking.find({ userId }).sort({ createdAt: -1 });
+    res.json({ success: true, bookings });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
 
 // Get all ambulance bookings
 export const getBookings = async (req, res) => {

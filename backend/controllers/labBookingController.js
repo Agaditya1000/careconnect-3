@@ -5,7 +5,7 @@ export const createLabBooking = async (req, res) => {
     const { name, phone, email, testType, date, time, notes } = req.body;
 
     // Check for existing booking at the same date and time
-    const existingBooking = await LabBooking.findOne({ 
+    const existingBooking = await LabBooking.findOne({
       date: new Date(date),
       time,
       status: { $in: ['pending', 'confirmed'] }
@@ -19,6 +19,7 @@ export const createLabBooking = async (req, res) => {
     }
 
     const labBooking = new LabBooking({
+      userId: req.body.userId,
       name,
       phone,
       email,
@@ -46,17 +47,29 @@ export const createLabBooking = async (req, res) => {
   }
 };
 
+// Get user specific lab bookings
+export const getUserLabBookings = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const bookings = await LabBooking.find({ userId }).sort({ date: -1 });
+    res.json({ success: true, bookings });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
+
 export const getLabBookings = async (req, res) => {
   try {
     const { email, date, status } = req.query;
     const query = {};
-    
+
     if (email) query.email = email;
     if (date) query.date = new Date(date);
     if (status) query.status = status;
 
     const labBookings = await LabBooking.find(query).sort({ date: 1, time: 1 });
-    
+
     res.status(200).json({
       success: true,
       count: labBookings.length,

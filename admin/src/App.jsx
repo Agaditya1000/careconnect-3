@@ -10,6 +10,10 @@ import Dashboard from './pages/Admin/Dashboard';
 import AllAppointments from './pages/Admin/AllAppointments';
 import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorsList from './pages/Admin/DoctorsList';
+import AmbulanceBookings from './pages/Admin/AmbulanceBookings';
+import LabBookings from './pages/Admin/LabBookings';
+import AddProduct from './pages/Admin/AddProduct';
+import ProductList from './pages/Admin/ProductList';
 import Login from './pages/Login';
 import DoctorAppointments from './pages/Doctor/DoctorAppointments';
 import DoctorDashboard from './pages/Doctor/DoctorDashboard';
@@ -32,6 +36,10 @@ const App = () => {
           <Route path='/all-appointments' element={<AllAppointments />} />
           <Route path='/add-doctor' element={<AddDoctor />} />
           <Route path='/doctor-list' element={<DoctorsList />} />
+          <Route path='/ambulance-list' element={<AmbulanceBookings />} />
+          <Route path='/lab-list' element={<LabBookings />} />
+          <Route path='/add-product' element={<AddProduct />} />
+          <Route path='/product-list' element={<ProductList />} />
           <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
           <Route path='/doctor-appointments' element={<DoctorAppointments />} />
           <Route path='/doctor-profile' element={<DoctorProfile />} />

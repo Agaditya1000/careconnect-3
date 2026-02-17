@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/userModel.js";
+import AmbulanceBooking from "../models/AmbulanceBooking.js";
+import LabBooking from "../models/LabBooking.js";
 
 // API for admin login
 const loginAdmin = async (req, res) => {
@@ -132,16 +134,92 @@ const adminDashboard = async (req, res) => {
         const doctors = await doctorModel.find({})
         const users = await userModel.find({})
         const appointments = await appointmentModel.find({})
+        const ambulanceBookings = await AmbulanceBooking.find({})
+        const labBookings = await LabBooking.find({})
 
         const dashData = {
             doctors: doctors.length,
             appointments: appointments.length,
             patients: users.length,
-            latestAppointments: appointments.reverse()
+            ambulanceBookings: ambulanceBookings.length,
+            labBookings: labBookings.length,
+            latestAppointments: appointments.reverse(),
+            latestAmbulanceBookings: ambulanceBookings.reverse(),
+            latestLabBookings: labBookings.reverse()
         }
 
         res.json({ success: true, dashData })
 
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to get all ambulance bookings
+const ambulanceAdmin = async (req, res) => {
+    try {
+        const bookings = await AmbulanceBooking.find({}).sort({ createdAt: -1 })
+        res.json({ success: true, bookings })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to cancel ambulance booking
+const ambulanceCancel = async (req, res) => {
+    try {
+        const { bookingId } = req.body
+        await AmbulanceBooking.findByIdAndUpdate(bookingId, { status: 'cancelled' })
+        res.json({ success: true, message: 'Booking Cancelled' })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to approve ambulance booking (dispatch)
+const ambulanceApprove = async (req, res) => {
+    try {
+        const { bookingId } = req.body
+        await AmbulanceBooking.findByIdAndUpdate(bookingId, { status: 'dispatched' })
+        res.json({ success: true, message: 'Booking Dispatched' })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to get all lab bookings
+const labAdmin = async (req, res) => {
+    try {
+        const bookings = await LabBooking.find({}).sort({ createdAt: -1 })
+        res.json({ success: true, bookings })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to cancel lab booking
+const labCancel = async (req, res) => {
+    try {
+        const { bookingId } = req.body
+        await LabBooking.findByIdAndUpdate(bookingId, { status: 'cancelled' })
+        res.json({ success: true, message: 'Booking Cancelled' })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to confirm lab booking
+const labConfirm = async (req, res) => {
+    try {
+        const { bookingId } = req.body
+        await LabBooking.findByIdAndUpdate(bookingId, { status: 'confirmed' })
+        res.json({ success: true, message: 'Booking Confirmed' })
     } catch (error) {
         console.log(error)
         res.json({ success: false, message: error.message })
@@ -154,5 +232,11 @@ export {
     appointmentCancel,
     addDoctor,
     allDoctors,
-    adminDashboard
+    adminDashboard,
+    ambulanceAdmin,
+    ambulanceCancel,
+    ambulanceApprove,
+    labAdmin,
+    labCancel,
+    labConfirm
 }

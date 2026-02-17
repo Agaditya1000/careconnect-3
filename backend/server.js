@@ -9,6 +9,10 @@ import adminRouter from "./routes/adminRoute.js";
 import chatbotRoutes from "./routes/chatbotRoutes.js";
 import ambulanceRoutes from "./routes/ambulanceRoutes.js";
 import { labBookingRouter } from "./routes/labBookingRoutes.js";
+import productRouter from "./routes/productRoute.js";
+import orderRouter from "./routes/orderRoute.js";
+import medicineRouter from "./routes/medicineRoute.js";
+import medicalRecordRouter from "./routes/medicalRecordRoute.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -20,6 +24,10 @@ connectCloudinary();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // API endpoints
 app.use("/api/user", userRouter);
@@ -27,7 +35,11 @@ app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/chat", chatbotRoutes);
 app.use("/api/ambulance", ambulanceRoutes);
-app.use("/api/lab-bookings", labBookingRouter); // Updated endpoint
+app.use("/api/lab-bookings", labBookingRouter);
+app.use("/api/product", productRouter);
+app.use("/api/order", orderRouter);
+app.use("/api/medicine", medicineRouter);
+app.use("/api/medical-record", medicalRecordRouter);
 
 app.get("/", (req, res) => {
   res.send("API Working");
@@ -36,26 +48,13 @@ app.get("/", (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     success: false,
-    message: 'Something went wrong!' 
+    message: 'Something went wrong!'
   });
 });
 
 
-app.use(cors());
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-    );
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-    );
-    next();
-});
+
 
 app.listen(port, () => console.log(`Server started on PORT:${port}`));
